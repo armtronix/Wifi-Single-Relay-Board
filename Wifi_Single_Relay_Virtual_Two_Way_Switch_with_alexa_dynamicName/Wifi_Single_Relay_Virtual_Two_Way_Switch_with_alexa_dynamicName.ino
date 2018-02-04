@@ -88,7 +88,7 @@ int webtypeGlob;
 int otaCount = 300; //imeout in sec for OTA mode
 int current; //Current state of the button
 int switch_status; //Physical state of the switch
-int state_sw ;
+int state_sw=0;
 int send_status;
 unsigned long count = 0; //Button press time counter
 String st; //WiFi Stations HTML list
@@ -224,13 +224,13 @@ void btn_handle()
 void loop() {
 
 
-   if(switch_status==(digitalRead(SWITCH_INPIN)))// to read the status of physical switch
+   if(switch_status==(!digitalRead(SWITCH_INPIN)))// to read the status of physical switch
    {
         // send_status=0;
    }
    else
    {
-    switch_status=(digitalRead(SWITCH_INPIN));
+    switch_status=(!digitalRead(SWITCH_INPIN));
      send_status=1;
    }
 
@@ -316,10 +316,10 @@ void loop() {
 }
 
 
-void callback(uint8_t device_id, const char * device_name, bool state) {
+void callback(uint8_t device_id, const char * device_name, bool state_alexa) {
   Serial.print("Device "); Serial.print(device_name); 
   Serial.print(" state: ");
-  if (state) {
+  if (state_alexa) {
     Serial.println("ON");
   } else {
     Serial.println("OFF");
@@ -327,10 +327,12 @@ void callback(uint8_t device_id, const char * device_name, bool state) {
   //Switching action on detection of device name
   if ( (strcmp(device_name, (char*)firstName.c_str()) == 0) ) {
     // adjust the relay immediately!
-    if (state) {
-      digitalWrite(OUTPIN, HIGH);
+    if (state_alexa) {
+      state_sw=1;
+      //digitalWrite(OUTPIN, HIGH);
     } else {
-      digitalWrite(OUTPIN, LOW);
+      state_sw=0;
+      //digitalWrite(OUTPIN, LOW);
     }
   }
 
